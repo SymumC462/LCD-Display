@@ -4,6 +4,7 @@
 #include <string>
 using namespace std;
 
+
 string displayA(int i2c) 
 {
     cout << "Displaying letter 'A'..." << endl;
@@ -22,6 +23,61 @@ string displayA(int i2c)
     usleep(100);  // Small delay
     
     return "Letter 'A' sent!";
+}
+
+void printName(int i2c)
+{
+    cout << "Printing name..." << endl;
+
+    lgI2cWriteByte(i2c, 0x5D);
+    lgI2cWriteByte(i2c, 0x59);
+    lgI2cWriteByte(i2c, 0x3D);
+    lgI2cWriteByte(i2c, 0x39);
+    
+    lgI2cWriteByte(i2c, 0x7D);
+    lgI2cWriteByte(i2c, 0x79);
+    lgI2cWriteByte(i2c, 0x9D);
+    lgI2cWriteByte(i2c, 0x99);
+
+    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x69);
+    lgI2cWriteByte(i2c, 0xDD);
+    lgI2cWriteByte(i2c, 0xD9);
+
+    lgI2cWriteByte(i2c, 0x7D);
+    lgI2cWriteByte(i2c, 0x79);
+    lgI2cWriteByte(i2c, 0x5D);
+    lgI2cWriteByte(i2c, 0x59);
+
+    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x69);
+    lgI2cWriteByte(i2c, 0xDD);
+    lgI2cWriteByte(i2c, 0xD9);
+
+    lgI2cWriteByte(i2c, 0x2D);
+    lgI2cWriteByte(i2c, 0x29);
+    lgI2cWriteByte(i2c, 0x0D);
+    lgI2cWriteByte(i2c, 0x09);
+
+    lgI2cWriteByte(i2c, 0x4D);
+    lgI2cWriteByte(i2c, 0x49);
+    lgI2cWriteByte(i2c, 0x3D);
+    lgI2cWriteByte(i2c, 0x39);
+
+    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x69);
+    lgI2cWriteByte(i2c, 0x8D);
+    lgI2cWriteByte(i2c, 0x89);
+
+    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x69);
+    lgI2cWriteByte(i2c, 0xFD);
+    lgI2cWriteByte(i2c, 0x29);
+
+    usleep(100);
+
+    cout << "Name printed!" << endl;
+
 }
 
 void clearScreen(int i2c_handle) 
@@ -47,7 +103,7 @@ int main() {
 
     cout << "Writing a..." << endl;
 
-    displayA(i2c_handle);
+    printName(i2c_handle);
     usleep(1000000);
     clearScreen(i2c_handle);
     
