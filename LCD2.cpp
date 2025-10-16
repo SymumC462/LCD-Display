@@ -29,47 +29,47 @@ void printName(int i2c)
 {
     cout << "Printing name..." << endl;
 
-    lgI2cWriteByte(i2c, 0x5D);
+    lgI2cWriteByte(i2c, 0x5D); // S
     lgI2cWriteByte(i2c, 0x59);
     lgI2cWriteByte(i2c, 0x3D);
     lgI2cWriteByte(i2c, 0x39);
     
-    lgI2cWriteByte(i2c, 0x7D);
+    lgI2cWriteByte(i2c, 0x7D); // y
     lgI2cWriteByte(i2c, 0x79);
     lgI2cWriteByte(i2c, 0x9D);
     lgI2cWriteByte(i2c, 0x99);
 
-    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x6D); // m
     lgI2cWriteByte(i2c, 0x69);
     lgI2cWriteByte(i2c, 0xDD);
     lgI2cWriteByte(i2c, 0xD9);
 
-    lgI2cWriteByte(i2c, 0x7D);
+    lgI2cWriteByte(i2c, 0x7D); // u 
     lgI2cWriteByte(i2c, 0x79);
     lgI2cWriteByte(i2c, 0x5D);
     lgI2cWriteByte(i2c, 0x59);
 
-    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x6D); // m
     lgI2cWriteByte(i2c, 0x69);
     lgI2cWriteByte(i2c, 0xDD);
     lgI2cWriteByte(i2c, 0xD9);
 
-    lgI2cWriteByte(i2c, 0x2D);
+    lgI2cWriteByte(i2c, 0x2D); // space
     lgI2cWriteByte(i2c, 0x29);
     lgI2cWriteByte(i2c, 0x0D);
     lgI2cWriteByte(i2c, 0x09);
 
-    lgI2cWriteByte(i2c, 0x4D);
+    lgI2cWriteByte(i2c, 0x4D); // C
     lgI2cWriteByte(i2c, 0x49);
     lgI2cWriteByte(i2c, 0x3D);
     lgI2cWriteByte(i2c, 0x39);
 
-    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x6D); // h
     lgI2cWriteByte(i2c, 0x69);
     lgI2cWriteByte(i2c, 0x8D);
     lgI2cWriteByte(i2c, 0x89);
 
-    lgI2cWriteByte(i2c, 0x6D);
+    lgI2cWriteByte(i2c, 0x6D); // o
     lgI2cWriteByte(i2c, 0x69);
     lgI2cWriteByte(i2c, 0xFD);
     lgI2cWriteByte(i2c, 0x29);
@@ -93,6 +93,47 @@ void clearScreen(int i2c_handle)
     cout << "Clear command sent!" << endl;
 }
 
+void initLCD(int i2c_handle) {
+    cout << "Initializing LCD..." << endl;
+    
+    usleep(50000);  // Wait 50ms after power on
+    
+    // Put LCD into 4-bit mode (send 0x03 three times, then 0x02)
+    lgI2cWriteByte(i2c_handle, 0x3C);
+    lgI2cWriteByte(i2c_handle, 0x38);
+    usleep(5000);
+    
+    lgI2cWriteByte(i2c_handle, 0x3C);
+    lgI2cWriteByte(i2c_handle, 0x38);
+    usleep(5000);
+    
+    lgI2cWriteByte(i2c_handle, 0x3C);
+    lgI2cWriteByte(i2c_handle, 0x38);
+    usleep(5000);
+    
+    lgI2cWriteByte(i2c_handle, 0x2C);
+    lgI2cWriteByte(i2c_handle, 0x28);
+    usleep(5000);
+    
+    cout << "LCD initialized!" << endl;
+}
+
+void printMsg(string msg, int i2c_handle)
+{
+    int upper;
+    int lower;
+    for (int i = 0; i < msg.size(); i++)
+    {
+        cout << "character " << i << ": " << msg.at(i) << endl;
+        upper = (msg.at(i) & 0xF0);        
+        lower = (msg.at(i) & 0x0F) << 4;
+        lgI2cWriteByte(i2c_handle, upper | 0x0D);
+        lgI2cWriteByte(i2c_handle, upper | 0x09);
+        lgI2cWriteByte(i2c_handle, lower | 0x0D);
+        lgI2cWriteByte(i2c_handle, lower | 0x09);
+    }
+
+}
 int main() {
     int i2c_handle = lgI2cOpen(1, 0x27, 0);
     
@@ -100,10 +141,11 @@ int main() {
         cout << "Failed to open I2C connection" << endl;
         return 1;
     }
+    initLCD(i2c_handle);
 
     cout << "Writing a..." << endl;
 
-    printName(i2c_handle);
+    printMsg("Symum Chowdhury", i2c_handle);
     usleep(1000000);
     clearScreen(i2c_handle);
     
