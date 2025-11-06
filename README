@@ -1,10 +1,18 @@
 # How to send commands and how to send text to print
-It takes in a command (to print a letter/word, clear the screen, initiliaze the screen, set it to a certain mode, etc.) in bytes through your code.
-Based on those bytes, the lgpio.h library takes in these bytes and talks to the Linux Kernel (the core component of the Linux OS). 
-The Linux Kernel then sends electrical signals throught the LCD pins (SDA/SCL), and the specific address (0x27) lets the specific device know the command is for that device. 
-The I2C Protocol signifies how the commands should be taken, and the PCF8574 chip on the device is responsible for translating from the Pi's I2c language into the LCD screen's parallel language, succesfully receiving and decoding the signals.
-After the decoding, the LCD knows what it needs to do based on your code and does so.
+// Specific Steps
+
+1) It takes in a command (to print a letter/word, clear the screen, initiliaze the screen, set it to a certain mode, etc.) in bytes through your code.
+2) Based on those bytes, the lgpio.h library takes in these bytes and talks to the Linux Kernel (the core component of the Linux OS). 
+3) The Linux Kernel then sends electrical signals throught the LCD pins (SDA/SCL), and the specific address (0x27) lets the specific device know the command is for that device. 
+4) The I2C Protocol signifies how the commands should be taken, and the PCF8574 chip on the device is responsible for translating from the Pi's I2c language into the LCD screen's parallel language, succesfully receiving and decoding the signals.
+5) After the decoding, the LCD knows what it needs to do based on your code and does so.
+
+// Explaining how the function undergoes these steps
+
 In the code itself, the lgI2cWriteByte(int handle, unsigned byte) function takes in your byte (8 bits of info) and sends it to the Linux Kernel, which sends signals to the PCF8574 and the 8 output pins on the PCF8574 are changed to match your 8 bits. Those electrial signals change the EN pin (Enable pin) from low voltage (0 V) to high (3.3V), which signals it to read the instructions given.
+
+// Explaining the system of bytes and how that results in having to use four of the write byte function to perform just one command
+
 In order to perform one command, it requires four of this function because we can only use 4 data pins (D7 - D4) at a time, so the 8 bits are split into two groups of 4 (left 4 bits are called the upper nibble, and the right 4 bits are called the lower nibble). For each nibble, we run the function for EN is low and then again to make EN high (which is when it will actually take in the bits). A useful analogy here is like taking a photograph: that when EN = 0 (low voltage/ 0V) the camera is positioned on the subjects being photographed (in this case, the pins are positioned to take in the bits). But you only ever take the photo when you press the shutter button (in this case, the pins will only take in the bits when the EN is 1 - high/3.3V). That takes two of the function for the upper nibble, then the same is done for the lower nibble which then combines the two into one command based on a byte.
 # How to initialize
 Initializing is about setting up the device to be in a certain state that will be known and working for us. A useful analogy is that initializing a printer would mean turning it on, loading paper, setting it to portrait mode, telling it paper size and color/black-and-white, etc. Without this, the printer won't know how exactly to perform best to our interests (may print sideways or with black-and-white when we want color)
