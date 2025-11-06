@@ -5,10 +5,23 @@
 #include <unistd.h>
 using namespace std;
 
-void LCDScreen::seti2c(int i2c)
+int i2c_handle;
+
+LCDScreen::LCDScreen()
 {
-    i2c_handle = i2c;
+    i2c_handle = lgI2cOpen(1, 0x27, 0);
+    if (i2c_handle < 0) 
+    {
+        throw std::runtime_error("Failed to open I2C connection");
+    }
+    init();
 }
+
+LCDScreen::~LCDScreen()
+{
+    lgI2cClose(i2c_handle);
+}
+
 void LCDScreen::displayStatic(string msg)
 {
     int upper;
