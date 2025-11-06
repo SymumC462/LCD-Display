@@ -5,3 +5,6 @@ build:
 
 run:
 	sudo ./lcd
+
+buildrun:
+	g++ -o lcd LCD2.cpp Services/*.cpp -llgpio && sudo ./lcd
