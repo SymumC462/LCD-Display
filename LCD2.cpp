@@ -5,81 +5,70 @@
 using namespace std;
 
 
-string displayA(int i2c) 
+class LCDScreen 
 {
-    cout << "Displaying letter 'A'..." << endl;
+    private: 
+        int i2c_handle;
+
+    public:
+        void seti2c(int i2c)
+        {
+            i2c_handle = i2c;
+        }
+        void displayStatic(string msg)
+        {
+            int upper;
+            int lower;
+            for (int i = 0; i < msg.size(); i++)
+            {
+                cout << "character " << i << ": " << msg.at(i) << endl;
+                upper = (msg.at(i) & 0xF0);        
+                lower = (msg.at(i) & 0x0F) << 4;
+                lgI2cWriteByte(i2c_handle, upper | 0x0D);
+                lgI2cWriteByte(i2c_handle, upper | 0x09);
+                lgI2cWriteByte(i2c_handle, lower | 0x0D);
+                lgI2cWriteByte(i2c_handle, lower | 0x09);
+            }
+        }
+        void clear()
+        {
+            cout << "Clearing LCD screen..." << endl;
+            lgI2cWriteByte(i2c_handle, 0x0C);
+            lgI2cWriteByte(i2c_handle, 0x08);
+            lgI2cWriteByte(i2c_handle, 0x1C);
+            lgI2cWriteByte(i2c_handle, 0x18); //refactor
+
+            usleep(5000);  // Wait 5ms for clear to complete (longer delay)
+
+            cout << "Clear command sent!" << endl;
+        
+        }
+        void displayScroll(string msg, int times)
+        {
+            cout << "Printing and Scrolling Message: " << msg << endl;
+            displayStatic(msg);
+            usleep(500000);
+            clear();
+            for (int i = 1; i <= times; i++)
+            {
+                for (int j = 1; j <= i; j++)
+                {
+                    displayStatic(" ");
+                }
+                displayStatic(msg);
+                usleep(50000);
+                clear();
+            }
+        }
+
+        
+        
+        
+        
     
-    // ASCII code for 'A' is 0x41 (0100 0001 in binary)
-    // Upper nibble = 0x4, Lower nibble = 0x1
-    
-    // Send upper nibble (0x4) with RS=1 (data mode)
-    lgI2cWriteByte(i2c, 0x4D);  // 0100 1101: data=0x4, RS=1, EN=1, BL=1
-    lgI2cWriteByte(i2c, 0x49);  // 0100 1001: data=0x4, RS=1, EN=0, BL=1
-    
-    // Send lower nibble (0x1) with RS=1 (data mode)
-    lgI2cWriteByte(i2c, 0x1D);  // 0001 1101: data=0x1, RS=1, EN=1, BL=1
-    lgI2cWriteByte(i2c, 0x19);  // 0001 1001: data=0x1, RS=1, EN=0, BL=1
-    
-    usleep(100);  // Small delay
-    
-    return "Letter 'A' sent!";
-}
+};
 
-void printName(int i2c)
-{
-    cout << "Printing name..." << endl;
-
-    lgI2cWriteByte(i2c, 0x5D); // S
-    lgI2cWriteByte(i2c, 0x59);
-    lgI2cWriteByte(i2c, 0x3D);
-    lgI2cWriteByte(i2c, 0x39);
-    
-    lgI2cWriteByte(i2c, 0x7D); // y
-    lgI2cWriteByte(i2c, 0x79);
-    lgI2cWriteByte(i2c, 0x9D);
-    lgI2cWriteByte(i2c, 0x99);
-
-    lgI2cWriteByte(i2c, 0x6D); // m
-    lgI2cWriteByte(i2c, 0x69);
-    lgI2cWriteByte(i2c, 0xDD);
-    lgI2cWriteByte(i2c, 0xD9);
-
-    lgI2cWriteByte(i2c, 0x7D); // u 
-    lgI2cWriteByte(i2c, 0x79);
-    lgI2cWriteByte(i2c, 0x5D);
-    lgI2cWriteByte(i2c, 0x59);
-
-    lgI2cWriteByte(i2c, 0x6D); // m
-    lgI2cWriteByte(i2c, 0x69);
-    lgI2cWriteByte(i2c, 0xDD);
-    lgI2cWriteByte(i2c, 0xD9);
-
-    lgI2cWriteByte(i2c, 0x2D); // space
-    lgI2cWriteByte(i2c, 0x29);
-    lgI2cWriteByte(i2c, 0x0D);
-    lgI2cWriteByte(i2c, 0x09);
-
-    lgI2cWriteByte(i2c, 0x4D); // C
-    lgI2cWriteByte(i2c, 0x49);
-    lgI2cWriteByte(i2c, 0x3D);
-    lgI2cWriteByte(i2c, 0x39);
-
-    lgI2cWriteByte(i2c, 0x6D); // h
-    lgI2cWriteByte(i2c, 0x69);
-    lgI2cWriteByte(i2c, 0x8D);
-    lgI2cWriteByte(i2c, 0x89);
-
-    lgI2cWriteByte(i2c, 0x6D); // o
-    lgI2cWriteByte(i2c, 0x69);
-    lgI2cWriteByte(i2c, 0xFD);
-    lgI2cWriteByte(i2c, 0x29);
-
-    usleep(100);
-
-    cout << "Name printed!" << endl;
-
-}
-
+            
 void clearScreen(int i2c_handle) 
 {
     cout << "Clearing LCD screen..." << endl;
@@ -114,6 +103,34 @@ void initLCD(int i2c_handle) {
     lgI2cWriteByte(i2c_handle, 0x2C);
     lgI2cWriteByte(i2c_handle, 0x28);
     usleep(5000);
+
+    // Function set: 4-bit, 2 lines, 5x8 font
+    lgI2cWriteByte(i2c_handle, 0x2C);
+    lgI2cWriteByte(i2c_handle, 0x28);
+    lgI2cWriteByte(i2c_handle, 0x8C);
+    lgI2cWriteByte(i2c_handle, 0x88);
+    usleep(2000);
+    
+    // Display on, cursor off, blink off
+    lgI2cWriteByte(i2c_handle, 0x0C);
+    lgI2cWriteByte(i2c_handle, 0x08);
+    lgI2cWriteByte(i2c_handle, 0xCC);
+    lgI2cWriteByte(i2c_handle, 0xC8);
+    usleep(2000);
+    
+    // Entry mode: increment cursor
+    lgI2cWriteByte(i2c_handle, 0x0C);
+    lgI2cWriteByte(i2c_handle, 0x08);
+    lgI2cWriteByte(i2c_handle, 0x6C);
+    lgI2cWriteByte(i2c_handle, 0x68);
+    usleep(2000);
+    
+    // Clear display
+    lgI2cWriteByte(i2c_handle, 0x0C);
+    lgI2cWriteByte(i2c_handle, 0x08);
+    lgI2cWriteByte(i2c_handle, 0x1C);
+    lgI2cWriteByte(i2c_handle, 0x18);
+    usleep(5000);
     
     cout << "LCD initialized!" << endl;
 }
@@ -134,20 +151,41 @@ void printMsg(string msg, int i2c_handle)
     }
 
 }
+
+
+
+void printAndScroll(string msg, int i2c_handle, int times)
+{
+    cout << "Printing and Scrolling Message: " << msg << endl;
+    printMsg(msg, i2c_handle);
+    usleep(500000);
+    clearScreen(i2c_handle);
+    for (int i = 1; i <= times; i++)
+    {
+       for (int j = 1; j <= i; j++)
+       {
+        printMsg(" ", i2c_handle);
+       }
+       printMsg(msg, i2c_handle);
+       usleep(50000);
+       clearScreen(i2c_handle);
+    }
+    
+}
 int main() {
+    LCDScreen lcd;
     int i2c_handle = lgI2cOpen(1, 0x27, 0);
     
     if (i2c_handle < 0) {
         cout << "Failed to open I2C connection" << endl;
         return 1;
     }
+    lcd.seti2c(i2c_handle);
     initLCD(i2c_handle);
-
-    cout << "Writing a..." << endl;
-
-    printMsg("Symum Chowdhury", i2c_handle);
+    lcd.displayScroll("Symum", 16);
     usleep(1000000);
-    clearScreen(i2c_handle);
+    lcd.clear();
+    
     
     // Send clear command (0x01) as COMMAND (RS=0)
     // uint8_t command = 0x01;  // Clear display command
