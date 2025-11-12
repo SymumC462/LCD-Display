@@ -12,7 +12,8 @@ class LCDScreen
         ~LCDScreen();
         void displayStatic(std::string msg);
         void clear();
-        void displayScroll(std::string msg, int times);
+        void displayScroll(std::string msg);
+        void moveToSecondLine();
         
 };
 

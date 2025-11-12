@@ -6,6 +6,7 @@
 using namespace std;
 
 int i2c_handle;
+const int NUM_COLUMNS = 16;
 
 LCDScreen::LCDScreen()
 {
@@ -51,21 +52,27 @@ void LCDScreen::clear()
     cout << "Clear command sent!" << endl;        
 }
 
-void LCDScreen::displayScroll(string msg, int times)
+void LCDScreen::moveToSecondLine()
+{
+    // Move cursor to second line, row 1, column 0 (command 0xC0)
+    lgI2cWriteByte(i2c_handle, 0xCC);  
+    lgI2cWriteByte(i2c_handle, 0xC8);  
+    lgI2cWriteByte(i2c_handle, 0x0C);  
+    lgI2cWriteByte(i2c_handle, 0x08);
+}
+void LCDScreen::displayScroll(string msg)
 {
     cout << "Printing and Scrolling Message: " << msg << endl;
     displayStatic(msg);
     usleep(500000);
-    clear();
-    for (int i = 1; i <= times; i++)
+    for (int i = 0; i < NUM_COLUMNS; i++)
     {
-        for (int j = 1; j <= i; j++)
-        {
-            displayStatic(" ");
-        }
-        displayStatic(msg);
-        usleep(50000);
-        clear();
+        // shift to the right by 1 
+        lgI2cWriteByte(i2c_handle, 0x1C);
+        lgI2cWriteByte(i2c_handle, 0x18);
+        lgI2cWriteByte(i2c_handle, 0xCC);
+        lgI2cWriteByte(i2c_handle, 0xC8);
+        usleep(100000);
     }
 }
 

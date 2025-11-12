@@ -8,7 +8,10 @@ using namespace std;
 int main() {
     LCDScreen lcd;
     lcd.clear();
-    lcd.displayScroll("Charlie", 16);
+    lcd.displayScroll("Symum");
+    lcd.clear();
+    lcd.moveToSecondLine();
+    lcd.displayScroll("Symum");
     return 0;
 }
 
