@@ -4,7 +4,7 @@ build:
 	g++ -o lcd LCD2.cpp Services/*.cpp -llgpio
 
 run:
-	sudo ./lcd
+	sudo ./lcd $(ARGS)
 
 buildrun:
-	g++ -o lcd LCD2.cpp Services/*.cpp -llgpio && sudo ./lcd
+	g++ -o lcd LCD2.cpp Services/*.cpp -llgpio && sudo ./lcd $(ARGS)
