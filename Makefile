@@ -1,7 +1,7 @@
 # Simple Makefile for LCD Project
 
 build:
-	g++ -o lcd LCD2.cpp Services/*.cpp -llgpio
+	g++ -o lcd LCD2.cpp Services/*.cpp -llgpio -lcurl
 
 run:
 	sudo ./lcd $(ARGS)
