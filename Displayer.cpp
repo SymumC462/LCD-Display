@@ -1,9 +1,8 @@
 #include <iostream>
-#include <lgpio.h>
 #include <unistd.h>
 #include <string>
 #include <curl/curl.h>
-#include "Services/LCDScreen.hpp"
+#include "Interfaces/LCDScreen.hpp"
 #include <nlohmann/json.hpp>
 using namespace std;
 

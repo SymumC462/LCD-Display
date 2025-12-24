@@ -1,7 +1,7 @@
 #ifndef PILCDSCREEN_H
 #define PILCDSCREEN_H
 #include <string>
-#include "LCDScreen.hpp"  // Include the interface
+#include "../Interfaces/LCDScreen.hpp"  // Include the interface
 
 class PiLCDScreen : public LCDScreen  // Inherit from LCDScreen
 {

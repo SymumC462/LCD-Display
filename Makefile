@@ -8,3 +8,7 @@ run:
 
 buildrun:
 	g++ -o lcd LCD2.cpp Services/*.cpp -llgpio && sudo ./lcd $(ARGS)
+
+test:
+	 g++ -o Test/tests Test/tests.cpp Test/Doubles/*.cpp -lcurl && Test/tests
+
