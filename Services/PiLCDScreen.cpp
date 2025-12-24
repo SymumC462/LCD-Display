@@ -1,14 +1,13 @@
-#include "LCDScreen.hpp"
+#include "PiLCDScreen.hpp"
 #include <string>
 #include <iostream>
 #include <lgpio.h>
 #include <unistd.h>
 using namespace std;
 
-int i2c_handle;
 const int NUM_COLUMNS = 16;
 
-LCDScreen::LCDScreen()
+PiLCDScreen::PiLCDScreen()
 {
     i2c_handle = lgI2cOpen(1, 0x27, 0);
     if (i2c_handle < 0) 
@@ -18,12 +17,12 @@ LCDScreen::LCDScreen()
     init();
 }
 
-LCDScreen::~LCDScreen()
+PiLCDScreen::~PiLCDScreen()
 {
     lgI2cClose(i2c_handle);
 }
 
-void LCDScreen::displayStatic(string msg)
+void PiLCDScreen::displayStatic(string msg)
 {
     int upper;
     int lower;
@@ -39,20 +38,20 @@ void LCDScreen::displayStatic(string msg)
     }
 }
 
-void LCDScreen::clear()
+void PiLCDScreen::clear()
 {
     cout << "Clearing LCD screen..." << endl;
     lgI2cWriteByte(i2c_handle, 0x0C);
     lgI2cWriteByte(i2c_handle, 0x08);
     lgI2cWriteByte(i2c_handle, 0x1C);
-    lgI2cWriteByte(i2c_handle, 0x18); //refactor
+    lgI2cWriteByte(i2c_handle, 0x18);
 
     usleep(5000);  // Wait 5ms for clear to complete (longer delay)
 
     cout << "Clear command sent!" << endl;        
 }
 
-void LCDScreen::moveToSecondLine()
+void PiLCDScreen::moveToSecondLine()
 {
     // Move cursor to second line, row 1, column 0 (command 0xC0)
     lgI2cWriteByte(i2c_handle, 0xCC);  
@@ -60,7 +59,8 @@ void LCDScreen::moveToSecondLine()
     lgI2cWriteByte(i2c_handle, 0x0C);  
     lgI2cWriteByte(i2c_handle, 0x08);
 }
-void LCDScreen::displayScroll(string msg)
+
+void PiLCDScreen::displayScroll(string msg)
 {
     cout << "Printing and Scrolling Message: " << msg << endl;
     displayStatic(msg);
@@ -76,7 +76,7 @@ void LCDScreen::displayScroll(string msg)
     }
 }
 
-void LCDScreen::init()
+void PiLCDScreen::init()
 {
     cout << "Initializing LCD..." << endl;
     

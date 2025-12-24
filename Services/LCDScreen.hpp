@@ -4,17 +4,13 @@
 
 class LCDScreen
 {
-    private: 
-        int i2c_handle;
-        void init();
-    public:
-        LCDScreen();
-        ~LCDScreen();
-        void displayStatic(std::string msg);
-        void clear();
-        void displayScroll(std::string msg);
-        void moveToSecondLine();
-        
+public:
+    virtual ~LCDScreen() = default;  // Virtual destructor is important for interfaces
+    
+    virtual void displayStatic(std::string msg) = 0;
+    virtual void clear() = 0;
+    virtual void displayScroll(std::string msg) = 0;
+    virtual void moveToSecondLine() = 0;
 };
 
-#endif 
+#endif

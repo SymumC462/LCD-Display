@@ -10,8 +10,10 @@ using namespace std;
 class Displayer
 {
     private:
+        LCDScreen& lcd;
     public:
-    int Run(LCDScreen lcd, int argc, char* argv[]);
+        Displayer(LCDScreen& lcd) : lcd(lcd) {}
+        int Run(int argc, char* argv[]);
 };
 
 struct Main{
@@ -31,7 +33,7 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, string* output) 
     return totalSize;
 }
 
-int Displayer::Run(LCDScreen lcd, int argc, char* argv[])
+int Displayer::Run(int argc, char* argv[])
 {
     if (argc <= 2 && argv[1] == "Print")
     {
