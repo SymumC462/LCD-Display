@@ -14,22 +14,42 @@ void assertTrue(bool condition, string message)
     throw std::runtime_error(message);
 }
 
-int main(int argc, char* argv[]) {
-    LCDScreenSpy spy;
-    Displayer sut(spy);
-
+void PrintMessage_DisplaysMessage(Displayer& sut, LCDScreenSpy& lcdSpy)
+{
     char arg0[] = "testcmd";
     char arg1[] = "Print";
     char arg2[] = "test message";
     char* sutargv[] = { arg0, arg1, arg2 };
-    sut.Run(2, sutargv);
 
+    sut.Run(2, sutargv);
 
     vector<LCDCall> expectedCalls = 
         { LCDCall::DisplayScroll, LCDCall::MoveToSecondLine, LCDCall::DisplayScroll };
     vector<string> expectedMsgs = 
         { "test message", "test message" };
-    spy.shouldCallInOrder(expectedCalls, expectedMsgs);
+    lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
+}
+
+void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy)
+{
+    char arg0[] = "testcmd";
+    char arg1[] = "Weather";
+    char* sutargv[] = { arg0, arg1 };
+
+    sut.Run(2, sutargv);
+
+    vector<LCDCall> expectedCalls = 
+        { LCDCall::DisplayStatic, LCDCall::DisplayStatic, LCDCall::DisplayStatic };
+    vector<string> expectedMsgs = 
+        { "Temp: ", "%i", " F" };
+    lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
+}
+
+int main(int argc, char* argv[]) {
+    LCDScreenSpy lcdSpy;
+    Displayer sut(lcdSpy);
+
+    GetWeather_DisplaysWeather(sut, lcdSpy);
 
     cout << "\033[32m" << "✓ All tests passed" << "\033[0m" << endl;
     return 0;
