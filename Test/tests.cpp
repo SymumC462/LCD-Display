@@ -1,7 +1,18 @@
 #include <iostream>
 #include "Doubles/LCDScreenSpy.hpp"
 #include "../Displayer.cpp"
+#include <vector>
+
 using namespace std;
+
+void assertTrue(bool condition, string message)
+{
+    if (condition == true)
+    {
+        return;
+    }
+    throw std::runtime_error(message);
+}
 
 int main(int argc, char* argv[]) {
     LCDScreenSpy spy;
@@ -13,16 +24,12 @@ int main(int argc, char* argv[]) {
     char* sutargv[] = { arg0, arg1, arg2 };
     sut.Run(2, sutargv);
 
-    if (spy.displayScrollCallCount != 2)
-    {
-        cout << "Test failed with displayScrollCallCount not being 2" << endl;
-        return 1;
-    }
-    if (spy.moveToSecondLineCallCount != 1)
-    {
-        cerr << "\033[31m" << "Test failed with moveToSecondLineCallCount not being 1" << "\033[0m"  << endl;
-        return 1;
-    }
+
+    vector<LCDCall> expectedCalls = 
+        { LCDCall::DisplayScroll, LCDCall::MoveToSecondLine, LCDCall::DisplayScroll };
+    vector<string> expectedMsgs = 
+        { "test message", "test message" };
+    spy.shouldCallInOrder(expectedCalls, expectedMsgs);
 
     cout << "\033[32m" << "✓ All tests passed" << "\033[0m" << endl;
     return 0;

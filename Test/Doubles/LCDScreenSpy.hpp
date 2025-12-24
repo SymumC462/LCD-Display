@@ -1,20 +1,76 @@
 #ifndef LCDSCREENSPY_H
 #define LCDSCREENSPY_H
 #include <string>
-#include "../../Interfaces/LCDScreen.hpp"  // Include the interface
+#include <queue>
+#include "../../Interfaces/LCDScreen.hpp"
+#include <vector>
 
-class LCDScreenSpy : public LCDScreen  // Inherit from LCDScreen
-{
-public:
-    int displayScrollCallCount;
-    int moveToSecondLineCallCount;
-    LCDScreenSpy();
-    ~LCDScreenSpy() override;  // Override keyword for clarity
-    
-    void displayStatic(std::string msg) override;
-    void clear() override;
-    void displayScroll(std::string msg) override;
-    void moveToSecondLine() override;
+enum LCDCall {
+    DisplayScroll,
+    MoveToSecondLine
 };
 
+std::string lcdCallToString(LCDCall call) {
+    switch (call) {
+        case DisplayScroll:    return "DisplayScroll";
+        case MoveToSecondLine: return "MoveToSecondLine";
+        default:               return "Unknown";
+    }
+}
+
+class LCDScreenSpy : public LCDScreen
+{
+private:
+    std::queue<LCDCall> calls;
+    std::queue<std::string> messages;
+public:
+    LCDScreenSpy() {}
+    ~LCDScreenSpy() override {}
+    
+    void displayStatic(std::string msg) override {}
+    void clear() override {}
+    
+    void moveToSecondLine() override {
+        calls.push(LCDCall::MoveToSecondLine);
+    }
+    
+    void displayScroll(std::string msg) override {
+        calls.push(LCDCall::DisplayScroll);
+        messages.push(msg);
+    }
+
+    void shouldCallInOrder(std::vector<LCDCall> expectedCalls, std::vector<std::string> expectedMsgs) {
+        int i = 1;
+        for (LCDCall ec : expectedCalls)
+        {
+            LCDCall call = calls.front();
+            if (call != ec)
+            {
+                throw std::runtime_error(
+                        "Expected call number " + std::to_string(i) +
+                        " to be " + lcdCallToString(ec) +
+                        " but got " + lcdCallToString(call)
+                        );
+            }
+            if (call == LCDCall::DisplayScroll)
+            {
+                std::string msg = messages.front();
+                if (expectedMsgs.empty()){
+                    throw std::runtime_error("Validating msg but no expectedMsgs passed");
+                }
+                std::string expectedMsg = expectedMsgs.front();
+                if (expectedMsg != msg)
+                {
+                    throw std::runtime_error(
+                            "Expected call to me made with message " +
+                            expectedMsg + " but got " + msg
+                            );
+                }
+                expectedMsgs.erase(expectedMsgs.begin());
+            }
+            calls.pop();
+            i++;
+        }
+    }
+};
 #endif
