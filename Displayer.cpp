@@ -10,8 +10,9 @@ class Displayer
 {
     private:
         LCDScreen& lcd;
+        ostream& out;
     public:
-        Displayer(LCDScreen& lcd) : lcd(lcd) {}
+        Displayer(LCDScreen& lcd, ostream& outparam) : lcd(lcd), out(outparam){}
         int Run(int argc, char* argv[]);
 };
 
@@ -34,13 +35,13 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, string* output) 
 
 int Displayer::Run(int argc, char* argv[])
 {
-    if (argc <= 2 && argv[1] == "Print")
+    string mode = argv[1];
+    if (argc <= 2 && mode == "Print")
     {
-        cout << "Error: Both Mode and Argument must be provided" << endl;
+        out << "Error: Both Mode and Argument must be provided" << endl;
         return 1;
     }
-
-    string mode = argv[1];
+    
     if (mode == "Print") // argv[1] represents Mode
     {
         lcd.clear();
@@ -65,7 +66,7 @@ int Displayer::Run(int argc, char* argv[])
             const char* key = std::getenv("WEATHER_API_KEY");
             if (!key)
             {
-                std::cerr << "WEATHER_API_KEY didn't get set" << endl;
+                out << "WEATHER_API_KEY didn't get set" << endl;
                 return 1;
             }
             
@@ -83,7 +84,7 @@ int Displayer::Run(int argc, char* argv[])
 
             if (res != CURLE_OK)
             {
-                cout << "curl_easy_perform() failed" << endl;
+                out << "curl_easy_perform() failed" << endl;
             }
             else 
             {
@@ -97,13 +98,13 @@ int Displayer::Run(int argc, char* argv[])
         }
         else 
         {
-            cout << "initialization failed." << endl;
+            out << "initialization failed." << endl;
         }
         
     }
     else 
     {
-        cout << "Mode must be Print or Weather" << endl;
+        out << "Mode must be Print or Weather" << endl;
         return 1;
     }
     

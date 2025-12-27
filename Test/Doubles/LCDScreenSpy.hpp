@@ -84,5 +84,17 @@ public:
             i++;
         }
     }
+
+    void ShouldHaveNoCalls()
+    {
+        if (!calls.empty())
+        {
+            throw std::runtime_error("Expected no calls but there is a call");
+        }
+        if (!messages.empty())
+        {
+            throw std::runtime_error("Expected no messages but there is a message");
+        }
+    }
 };
 #endif

@@ -10,6 +10,6 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     PiLCDScreen lcd;
-    Displayer displayer(lcd);
+    Displayer displayer(lcd, cout);
     displayer.Run(argc, argv);
 }

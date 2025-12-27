@@ -16,14 +16,14 @@ void assertTrue(bool condition, string message)
 
 //// TESTS
 
-void PrintMessage_DisplaysMessage(Displayer& sut, LCDScreenSpy& lcdSpy)
+void PrintMessage_DisplaysMessage(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
 {
     char arg0[] = "testcmd";
     char arg1[] = "Print";
     char arg2[] = "test message";
     char* sutargv[] = { arg0, arg1, arg2 };
 
-    sut.Run(2, sutargv);
+    sut.Run(3, sutargv);
 
     vector<LCDCall> expectedCalls = 
         { LCDCall::DisplayScroll, LCDCall::MoveToSecondLine, LCDCall::DisplayScroll };
@@ -32,14 +32,14 @@ void PrintMessage_DisplaysMessage(Displayer& sut, LCDScreenSpy& lcdSpy)
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
 }
 
-void PrintMessage_DisplaysAnotherMessage(Displayer& sut, LCDScreenSpy& lcdSpy)
+void PrintMessage_DisplaysAnotherMessage(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
 {
     char arg0[] = "testcmd";
     char arg1[] = "Print";
     char arg2[] = "Hi this is test";
     char* sutargv[] = { arg0, arg1, arg2 };
 
-    sut.Run(2, sutargv);
+    sut.Run(3, sutargv);
 
     vector<LCDCall> expectedCalls = 
         { LCDCall::DisplayScroll, LCDCall::MoveToSecondLine, LCDCall::DisplayScroll };
@@ -48,7 +48,18 @@ void PrintMessage_DisplaysAnotherMessage(Displayer& sut, LCDScreenSpy& lcdSpy)
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
 }
 
-void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy)
+void PrintMessage_MissingArgument_DisplaysNoMessageAndCoutError(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
+{
+    char arg0[] = "testcmd";
+    char arg1[] = "Print";
+    char* sutargv[] = { arg0, arg1 };
+
+    sut.Run(2, sutargv);
+    lcdSpy.ShouldHaveNoCalls();
+    assertTrue(outSpy.str() == "Error: Both Mode and Argument must be provided\n", "Incorrect message printed");
+}
+
+void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
 {
     char arg0[] = "testcmd";
     char arg1[] = "Weather";
@@ -66,17 +77,19 @@ void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy)
 //// TEST END
 
 int main(int argc, char* argv[]) {
-    std::vector<std::function<void(Displayer&, LCDScreenSpy&)>> tests = {
+    std::vector<std::function<void(Displayer&, LCDScreenSpy&, stringstream&)>> tests = {
         PrintMessage_DisplaysMessage,
         PrintMessage_DisplaysAnotherMessage,
+        PrintMessage_MissingArgument_DisplaysNoMessageAndCoutError,
         GetWeather_DisplaysWeather
     };
 
     int i = 1;
     for (auto& test : tests) {
         LCDScreenSpy lcdSpy;
-        Displayer sut(lcdSpy);
-        test(sut, lcdSpy);
+        stringstream outSpy;
+        Displayer sut(lcdSpy, outSpy);
+        test(sut, lcdSpy, outSpy);
         cout << "\033[32m" << "Test " + to_string(i++) + " passed" << "\033[0m" << endl;
     }
 
