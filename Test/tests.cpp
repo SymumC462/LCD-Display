@@ -32,6 +32,22 @@ void PrintMessage_DisplaysMessage(Displayer& sut, LCDScreenSpy& lcdSpy)
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
 }
 
+void PrintMessage_DisplaysAnotherMessage(Displayer& sut, LCDScreenSpy& lcdSpy)
+{
+    char arg0[] = "testcmd";
+    char arg1[] = "Print";
+    char arg2[] = "Hi this is test";
+    char* sutargv[] = { arg0, arg1, arg2 };
+
+    sut.Run(2, sutargv);
+
+    vector<LCDCall> expectedCalls = 
+        { LCDCall::DisplayScroll, LCDCall::MoveToSecondLine, LCDCall::DisplayScroll };
+    vector<string> expectedMsgs = 
+        { "Hi this is test", "Hi this is test" };
+    lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
+}
+
 void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy)
 {
     char arg0[] = "testcmd";
@@ -52,6 +68,7 @@ void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy)
 int main(int argc, char* argv[]) {
     std::vector<std::function<void(Displayer&, LCDScreenSpy&)>> tests = {
         PrintMessage_DisplaysMessage,
+        PrintMessage_DisplaysAnotherMessage,
         GetWeather_DisplaysWeather
     };
 
