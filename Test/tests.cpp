@@ -59,6 +59,18 @@ void PrintMessage_MissingArgument_DisplaysNoMessageAndCoutError(Displayer& sut, 
     assertTrue(outSpy.str() == "Error: Both Mode and Argument must be provided\n", "Incorrect message printed");
 }
 
+void PrintMessage_MessageIsTooLong(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
+{
+    char arg0[] = "testcmd";
+    char arg1[] = "Print";
+    char arg2[] = "test message that is too long";
+    char* sutargv[] = { arg0, arg1, arg2 };
+
+    sut.Run(3, sutargv);
+    lcdSpy.ShouldHaveNoCalls();
+    assertTrue(outSpy.str() == "Error: Message too long to be displayed\n", "Incorrect message printed");
+}
+
 void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
 {
     char arg0[] = "testcmd";
@@ -74,6 +86,17 @@ void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstre
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
 }
 
+void ModeIsNotPrintOrWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
+{
+    char arg0[] = "testcmd";
+    char arg1[] = "PrinT";
+    char* sutargv[] = { arg0, arg1 };
+
+    sut.Run(2, sutargv);
+    lcdSpy.ShouldHaveNoCalls();
+    assertTrue(outSpy.str() == "Mode must be Print or Weather\n", "Incorrect message printed");
+}
+
 //// TEST END
 
 int main(int argc, char* argv[]) {
@@ -81,7 +104,9 @@ int main(int argc, char* argv[]) {
         PrintMessage_DisplaysMessage,
         PrintMessage_DisplaysAnotherMessage,
         PrintMessage_MissingArgument_DisplaysNoMessageAndCoutError,
-        GetWeather_DisplaysWeather
+        PrintMessage_MessageIsTooLong,
+        GetWeather_DisplaysWeather,
+        ModeIsNotPrintOrWeather
     };
 
     int i = 1;

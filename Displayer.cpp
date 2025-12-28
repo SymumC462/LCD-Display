@@ -36,19 +36,23 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, string* output) 
 int Displayer::Run(int argc, char* argv[])
 {
     string mode = argv[1];
+    
     if (argc <= 2 && mode == "Print")
     {
         out << "Error: Both Mode and Argument must be provided" << endl;
         return 1;
     }
-    
-    if (mode == "Print") // argv[1] represents Mode
+    if (mode == "Print" && strlen(argv[2]) < 17) 
     {
         lcd.clear();
-        lcd.displayScroll(argv[2]); // argv[2] is the string to be printed
+        lcd.displayScroll(argv[2]); // argv[2] is the message to be printed
         lcd.clear();
         lcd.moveToSecondLine();
         lcd.displayScroll(argv[2]);
+    }
+    else if (mode == "Print" && strlen(argv[2]) >= 17)
+    {
+        out << "Error: Message too long to be displayed" << endl;
     }
     else if (mode == "Weather")
     {
@@ -89,7 +93,7 @@ int Displayer::Run(int argc, char* argv[])
             else 
             {
                 lcd.displayStatic("Temp: ");
-                lcd.displayStatic(to_string(tempFahrenheit));
+                lcd.displayStatic(to_string(tempFahrenheit).substr(0, 5));
                 lcd.displayStatic(" F");
             }
 
