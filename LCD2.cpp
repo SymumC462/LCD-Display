@@ -6,10 +6,9 @@
 #include "Services/PiLCDScreen.hpp"
 #include <nlohmann/json.hpp>
 #include "Displayer.cpp"
-using namespace std;
 
 int main(int argc, char* argv[]) {
     PiLCDScreen lcd;
-    Displayer displayer(lcd, cout);
+    Displayer displayer(lcd, std::cout);
     displayer.Run(argc, argv);
 }

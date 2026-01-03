@@ -86,6 +86,18 @@ void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstre
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
 }
 
+void GetWeather_WeatherAPIIsDown(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
+{
+    char arg0[] = "testcmd";
+    char arg1[] = "Weather";
+    char* sutargv[] = { arg0, arg1 };
+
+    sut.Run(2, sutargv);
+
+    lcdSpy.ShouldHaveNoCalls();
+    assertTrue(outSpy.str() == "Weather API is down.\n", "Incorrect message printed");
+}
+
 void ModeIsNotPrintOrWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
 {
     char arg0[] = "testcmd";
@@ -106,6 +118,7 @@ int main(int argc, char* argv[]) {
         PrintMessage_MissingArgument_DisplaysNoMessageAndCoutError,
         PrintMessage_MessageIsTooLong,
         GetWeather_DisplaysWeather,
+        GetWeather_WeatherAPIIsDown,
         ModeIsNotPrintOrWeather
     };
 

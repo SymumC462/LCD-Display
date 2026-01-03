@@ -63,6 +63,7 @@ int Displayer::Run(int argc, char* argv[])
         double tempFahrenheit;
         WeatherReport report;
         
+        
 
         curl = curl_easy_init();
         if (curl)
@@ -88,7 +89,8 @@ int Displayer::Run(int argc, char* argv[])
 
             if (res != CURLE_OK)
             {
-                out << "curl_easy_perform() failed" << endl;
+                out << "Weather API is down." << endl;
+                cout << "res is NOT CURLE_OK." << endl;
             }
             else 
             {
