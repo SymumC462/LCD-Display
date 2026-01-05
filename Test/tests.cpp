@@ -118,7 +118,6 @@ int main(int argc, char* argv[]) {
         PrintMessage_MissingArgument_DisplaysNoMessageAndCoutError,
         PrintMessage_MessageIsTooLong,
         GetWeather_DisplaysWeather,
-        GetWeather_WeatherAPIIsDown,
         ModeIsNotPrintOrWeather
     };
 

@@ -4,6 +4,7 @@
 #include <curl/curl.h>
 #include "Interfaces/LCDScreen.hpp"
 #include <nlohmann/json.hpp>
+#include "Services/CurlWeatherClient.cpp"
 using namespace std;
 
 class Displayer
@@ -16,22 +17,6 @@ class Displayer
         int Run(int argc, char* argv[]);
 };
 
-struct Main{
-    double temp;
-};
-
-struct WeatherReport{
-    Main main;
-};
-
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Main, temp)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(WeatherReport, main)
-
-size_t WriteCallback(void* contents, size_t size, size_t nmemb, string* output) {
-    size_t totalSize = size * nmemb;
-    output->append((char*)contents, totalSize);
-    return totalSize;
-}
 
 int Displayer::Run(int argc, char* argv[])
 {
@@ -56,55 +41,27 @@ int Displayer::Run(int argc, char* argv[])
     }
     else if (mode == "Weather")
     {
-        string information;
-        CURL *curl;
-        CURLcode res;
-        double tempKelvin;
         double tempFahrenheit;
-        WeatherReport report;
-        
-        
-
-        curl = curl_easy_init();
-        if (curl)
+        CurlWeatherClient weather;
+        tempFahrenheit = weather.GetTempFahrenheit();
+        // Let's assume a day never comes where we experience a temperature under 0 degrees Fahrenheit
+        if (tempFahrenheit == -1) // signal that the key didn't get set
         {
-            const char* key = std::getenv("WEATHER_API_KEY");
-            if (!key)
-            {
-                out << "WEATHER_API_KEY didn't get set" << endl;
-                return 1;
-            }
-            
-            string url = "https://api.openweathermap.org/data/2.5/weather?lat=40.7127281&lon=-74.0060152&appid=" + string(key);
-
-            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &information);
-            res = curl_easy_perform(curl);
-            report = nlohmann::json::parse(information).get<WeatherReport>();
-            tempKelvin = report.main.temp;
-            tempFahrenheit = (tempKelvin - 273.15); // to Celsius
-            tempFahrenheit = (tempFahrenheit * 1.8) + 32; // to Fahrenheit
-            tempFahrenheit = trunc(tempFahrenheit * 100) / 100;
-
-            if (res != CURLE_OK)
-            {
-                out << "Weather API is down." << endl;
-                cout << "res is NOT CURLE_OK." << endl;
-            }
-            else 
-            {
-                lcd.displayStatic("Temp: ");
-                lcd.displayStatic(to_string(tempFahrenheit).substr(0, 5));
-                lcd.displayStatic(" F");
-            }
-
-            curl_easy_cleanup(curl);
-
+            out << "Key didn't get set." << endl;
         }
-        else 
+        else if (tempFahrenheit == -2) // signal that initialization failed
         {
-            out << "initialization failed." << endl;
+            out << "Curl nitialization failed." << endl;
+        }
+        else if (tempFahrenheit == -3) // signal that Weather API is Down
+        {
+            out << "Weather API is Down." << endl;
+        }
+        else
+        {
+            lcd.displayStatic("Temp: ");
+            lcd.displayStatic((to_string(tempFahrenheit)).substr(0,5));
+            lcd.displayStatic(" F");
         }
         
     }
