@@ -4,7 +4,7 @@
 #include <curl/curl.h>
 #include "Interfaces/LCDScreen.hpp"
 #include <nlohmann/json.hpp>
-#include "Services/CurlWeatherClient.cpp"
+#include "Services/CurlWeatherClient.hpp"
 using namespace std;
 
 class Displayer
