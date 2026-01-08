@@ -87,16 +87,18 @@ void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstre
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
 }
 
-void GetWeather_WeatherAPIIsDown(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
+void GetWeather_WeatherAPIIsDown(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy, WeatherClientSpy& weatherSpy)
 {
     char arg0[] = "testcmd";
     char arg1[] = "Weather";
     char* sutargv[] = { arg0, arg1 };
-
+    weatherSpy.SetTempFahrenheit(-3);
+    
     sut.Run(2, sutargv);
 
     lcdSpy.ShouldHaveNoCalls();
-    assertTrue(outSpy.str() == "Weather API is down.\n", "Incorrect message printed");
+    string outstring = outSpy.str();
+    assertTrue(outstring == "Weather API is Down.\n", "Incorrect message printed: " + outstring);
 }
 
 void ModeIsNotPrintOrWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
@@ -122,7 +124,8 @@ int main(int argc, char* argv[]) {
     };
 
     std::vector<std::function<void(Displayer&, LCDScreenSpy&, stringstream&, WeatherClientSpy&)>> weatherTests = {
-        GetWeather_DisplaysWeather
+        GetWeather_DisplaysWeather,
+        GetWeather_WeatherAPIIsDown
     };
 
     int i = 1;
