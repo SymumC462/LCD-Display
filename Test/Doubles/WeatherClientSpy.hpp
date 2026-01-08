@@ -5,12 +5,18 @@
 
 class WeatherClientSpy : public WeatherClient
 {
+private:
+    double tempFahrenheit;
 public:
     WeatherClientSpy() {}
     ~WeatherClientSpy() override {}
+    void SetTempFahrenheit(double temp)
+    {
+        tempFahrenheit = temp;
+    }
     double GetTempFahrenheit() override
     {
-        return 2;
+        return tempFahrenheit;
     }
 };
 #endif

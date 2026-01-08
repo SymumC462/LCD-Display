@@ -72,16 +72,18 @@ void PrintMessage_MessageIsTooLong(Displayer& sut, LCDScreenSpy& lcdSpy, strings
     assertTrue(outSpy.str() == "Error: Message too long to be displayed\n", "Incorrect message printed");
 }
 
-void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy, WeatherClientSpy&) {
+void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy, WeatherClientSpy& weatherSpy) {
     char arg0[] = "testcmd";
     char arg1[] = "Weather";
     char* sutargv[] = { arg0, arg1 };
+    weatherSpy.SetTempFahrenheit(6);
+
     sut.Run(2, sutargv);
 
     vector<LCDCall> expectedCalls = 
         { LCDCall::DisplayStatic, LCDCall::DisplayStatic, LCDCall::DisplayStatic };
     vector<string> expectedMsgs = 
-        { "Temp: ", "%i", " F" };
+        { "Temp: ", "6.000", " F" };
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);
 }
 
