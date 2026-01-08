@@ -4,7 +4,7 @@
 #include <curl/curl.h>
 #include "Interfaces/LCDScreen.hpp"
 #include <nlohmann/json.hpp>
-#include "Services/CurlWeatherClient.hpp"
+#include "Interfaces/WeatherClient.hpp"
 using namespace std;
 
 class Displayer
@@ -12,8 +12,10 @@ class Displayer
     private:
         LCDScreen& lcd;
         ostream& out;
+        WeatherClient& weather;
+
     public:
-        Displayer(LCDScreen& lcd, ostream& outparam) : lcd(lcd), out(outparam){}
+        Displayer(LCDScreen& lcd, ostream& outparam, WeatherClient& weather) : lcd(lcd), out(outparam), weather(weather) {}
         int Run(int argc, char* argv[]);
 };
 
@@ -42,7 +44,6 @@ int Displayer::Run(int argc, char* argv[])
     else if (mode == "Weather")
     {
         double tempFahrenheit;
-        CurlWeatherClient weather;
         tempFahrenheit = weather.GetTempFahrenheit();
         // Let's assume a day never comes where we experience a temperature under 0 degrees Fahrenheit
         if (tempFahrenheit == -1) // signal that the key didn't get set

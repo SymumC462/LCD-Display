@@ -3,6 +3,7 @@
 #include <string>
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
+#include "../Interfaces/WeatherClient.hpp"
 using namespace std;
 
 struct Main{
@@ -15,7 +16,7 @@ struct WeatherReport{
 
 
 
-class CurlWeatherClient
+class CurlWeatherClient : public WeatherClient
 {
 private:
     std::string information;
@@ -28,8 +29,8 @@ private:
 public:
 
     CurlWeatherClient();
-    ~CurlWeatherClient();
-    double GetTempFahrenheit();
+    ~CurlWeatherClient() override;
+    double GetTempFahrenheit() override;
 };
 
 

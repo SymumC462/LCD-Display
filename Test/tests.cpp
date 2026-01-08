@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Doubles/LCDScreenSpy.hpp"
 #include "../Displayer.cpp"
+#include "Doubles/WeatherClientSpy.hpp"
 #include <vector>
 
 using namespace std;
@@ -71,12 +72,10 @@ void PrintMessage_MessageIsTooLong(Displayer& sut, LCDScreenSpy& lcdSpy, strings
     assertTrue(outSpy.str() == "Error: Message too long to be displayed\n", "Incorrect message printed");
 }
 
-void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy)
-{
+void GetWeather_DisplaysWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream& outSpy, WeatherClientSpy&) {
     char arg0[] = "testcmd";
     char arg1[] = "Weather";
     char* sutargv[] = { arg0, arg1 };
-
     sut.Run(2, sutargv);
 
     vector<LCDCall> expectedCalls = 
@@ -112,21 +111,34 @@ void ModeIsNotPrintOrWeather(Displayer& sut, LCDScreenSpy& lcdSpy, stringstream&
 //// TEST END
 
 int main(int argc, char* argv[]) {
-    std::vector<std::function<void(Displayer&, LCDScreenSpy&, stringstream&)>> tests = {
+    std::vector<std::function<void(Displayer&, LCDScreenSpy&, stringstream&)>> printTests = {
         PrintMessage_DisplaysMessage,
         PrintMessage_DisplaysAnotherMessage,
         PrintMessage_MissingArgument_DisplaysNoMessageAndCoutError,
         PrintMessage_MessageIsTooLong,
-        GetWeather_DisplaysWeather,
         ModeIsNotPrintOrWeather
     };
 
+    std::vector<std::function<void(Displayer&, LCDScreenSpy&, stringstream&, WeatherClientSpy&)>> weatherTests = {
+        GetWeather_DisplaysWeather
+    };
+
     int i = 1;
-    for (auto& test : tests) {
+    for (auto& test : printTests) {
         LCDScreenSpy lcdSpy;
         stringstream outSpy;
-        Displayer sut(lcdSpy, outSpy);
+        WeatherClientSpy weatherSpy;
+        Displayer sut(lcdSpy, outSpy, weatherSpy);
         test(sut, lcdSpy, outSpy);
+        cout << "\033[32m" << "Test " + to_string(i++) + " passed" << "\033[0m" << endl;
+    }
+    for (auto&test : weatherTests)
+    {
+        LCDScreenSpy lcdSpy;
+        stringstream outSpy;
+        WeatherClientSpy weatherSpy;
+        Displayer sut(lcdSpy, outSpy, weatherSpy);
+        test(sut, lcdSpy, outSpy, weatherSpy);
         cout << "\033[32m" << "Test " + to_string(i++) + " passed" << "\033[0m" << endl;
     }
 

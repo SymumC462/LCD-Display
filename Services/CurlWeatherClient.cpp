@@ -16,6 +16,15 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(WeatherReport, main)
 CurlWeatherClient::CurlWeatherClient()
 {
     curl = curl_easy_init();
+}
+
+CurlWeatherClient::~CurlWeatherClient()
+{
+    curl_easy_cleanup(curl);
+}
+
+double CurlWeatherClient::GetTempFahrenheit()
+{
     if (curl)
     {
         const char* key = std::getenv("WEATHER_API_KEY");
@@ -36,27 +45,15 @@ CurlWeatherClient::CurlWeatherClient()
             tempFahrenheit = (tempKelvin - 273.15); // to Celsius
             tempFahrenheit = (tempFahrenheit * 1.8) + 32; // to Fahrenheit
             tempFahrenheit = trunc(tempFahrenheit * 100) / 100;
+            if (res != CURLE_OK)
+            {
+                return -3; // signal to Displayer that Weather API is down
+            }
         }    
     }
     else
     {
         tempFahrenheit = -2; // signal to Displayer that initialization failed
     }
-}
-
-CurlWeatherClient::~CurlWeatherClient()
-{
-    curl_easy_cleanup(curl);
-}
-
-double CurlWeatherClient::GetTempFahrenheit()
-{
-    if (res != CURLE_OK)
-    {
-        return -3; // signal to Displayer that Weather API is down
-    }
-    else
-    {
-        return tempFahrenheit;
-    }
+    return tempFahrenheit;
 }
