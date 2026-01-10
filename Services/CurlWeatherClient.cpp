@@ -11,7 +11,8 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, string* output) 
 
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Main, temp)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(WeatherReport, main)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Weather, main)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(WeatherReport, main, weather)
 
 CurlWeatherClient::CurlWeatherClient()
 {
@@ -36,6 +37,7 @@ double CurlWeatherClient::GetTempFahrenheit()
         {
             string url = "https://api.openweathermap.org/data/2.5/weather?lat=40.7127281&lon=-74.0060152&appid=" + string(key);
 
+            information.clear(); // needed because every request appends the json to information
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &information);
@@ -56,4 +58,37 @@ double CurlWeatherClient::GetTempFahrenheit()
         tempFahrenheit = -2; // signal to Displayer that initialization failed
     }
     return tempFahrenheit;
+}
+
+std::string CurlWeatherClient::GetStatus()
+{
+    if (curl)
+    {
+        const char* key = std::getenv("WEATHER_API_KEY");
+        if (!key)
+        {
+            status = "-1"; // signal to Displayer that key didn't get set
+        }
+        else
+        {
+            string url = "https://api.openweathermap.org/data/2.5/weather?lat=40.7127281&lon=-74.0060152&appid=" + string(key);
+
+            information.clear(); // needed because every request appends the json to information
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &information);
+            res = curl_easy_perform(curl);
+            report = nlohmann::json::parse(information).get<WeatherReport>();
+            status = report.weather[0].main; 
+            if (res != CURLE_OK)
+            {
+                return "-3"; // signal to Displayer that Weather API is down
+            }
+        }    
+    }
+    else
+    {
+        status = "-2"; // signal to Displayer that initialization failed
+    }
+    return status;    
 }

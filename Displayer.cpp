@@ -52,7 +52,7 @@ int Displayer::Run(int argc, char* argv[])
         }
         else if (tempFahrenheit == -2) // signal that initialization failed
         {
-            out << "Curl nitialization failed." << endl;
+            out << "Curl initialization failed." << endl;
         }
         else if (tempFahrenheit == -3) // signal that Weather API is Down
         {
@@ -63,8 +63,34 @@ int Displayer::Run(int argc, char* argv[])
             lcd.displayStatic("Temp: ");
             lcd.displayStatic((to_string(tempFahrenheit)).substr(0,5));
             lcd.displayStatic(" F");
+        }    
+    }
+    else if (mode == "Weather2")
+    {
+        double tempFahrenheit;
+        string status;
+        tempFahrenheit = weather.GetTempFahrenheit();
+        status = weather.GetStatus();
+        if (tempFahrenheit == -1 || status == "-1")
+        {
+            out << "Key didn't get set." << endl;
         }
-        
+        else if (tempFahrenheit == -2 || status == "-2")
+        {
+            out << "Curl initialization failed." << endl;
+        }
+        else if (tempFahrenheit == -3 || status == "-3")
+        {
+            out << "Weather API is Down." << endl;
+        }
+        else 
+        {
+            lcd.clear();
+            lcd.displayScroll("Temp: " + (to_string(tempFahrenheit)).substr(0,5) + " F");
+            lcd.clear();
+            lcd.moveToSecondLine();
+            lcd.displayScroll("Status: " + status);
+        }
     }
     else 
     {

@@ -10,10 +10,14 @@ struct Main{
     double temp;
 };
 
-struct WeatherReport{
-    Main main;
+struct Weather{
+    string main;
 };
 
+struct WeatherReport{
+    Main main;
+    vector<Weather> weather;
+};
 
 
 class CurlWeatherClient : public WeatherClient
@@ -25,12 +29,14 @@ private:
     double tempKelvin;
     double tempFahrenheit;
     WeatherReport report;
+    std::string status;
 
 public:
 
     CurlWeatherClient();
     ~CurlWeatherClient() override;
     double GetTempFahrenheit() override;
+    string GetStatus() override;
 };
 
 
