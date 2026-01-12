@@ -123,7 +123,7 @@ void GetWeather_TemperatureAndStatus(Displayer& sut, LCDScreenSpy& lcdSpy, strin
     sut.Run(2, sutargv);
 
     vector<LCDCall> expectedCalls = 
-        { LCDCall::DisplayScroll, LCDCall::MoveToSecondLine, LCDCall::DisplayScroll};
+        { LCDCall::DisplayStatic, LCDCall::MoveToSecondLine, LCDCall::DisplayStatic};
     vector<string> expectedMsgs = 
         { "Temp: 6.000 F", "Status: Clear"};
     lcdSpy.shouldCallInOrder(expectedCalls, expectedMsgs);

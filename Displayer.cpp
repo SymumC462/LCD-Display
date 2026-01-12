@@ -60,6 +60,7 @@ int Displayer::Run(int argc, char* argv[])
         }
         else
         {
+            lcd.clear();
             lcd.displayStatic("Temp: ");
             lcd.displayStatic((to_string(tempFahrenheit)).substr(0,5));
             lcd.displayStatic(" F");
@@ -86,10 +87,9 @@ int Displayer::Run(int argc, char* argv[])
         else 
         {
             lcd.clear();
-            lcd.displayScroll("Temp: " + (to_string(tempFahrenheit)).substr(0,5) + " F");
-            lcd.clear();
+            lcd.displayStatic("Temp: " + (to_string(tempFahrenheit)).substr(0,5) + " F");
             lcd.moveToSecondLine();
-            lcd.displayScroll("Status: " + status);
+            lcd.displayStatic("Status: " + status);
         }
     }
     else 
